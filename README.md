@@ -1,7 +1,7 @@
 # Street_network_generation_model
 
 This project constructs street network topology from eqasim output.
-It is meant to be used as a street geometry preprocessor for POLAIR/MUNICH.
+It is meant to be used as a street geometry preprocessor for POLAIR 3D and MUNICH air quality models.
 
 ## 1 - load BDTOPO data in data/load_BDTOPO
 a) python makeSUBbuildings.py
