@@ -39,7 +39,7 @@ This section describes command lines to run the model. Some codes are paralleliz
 * python groups.py (3d15h)  
 * python graph_transform.py (1d16h)  
 * python streets_distribution.py (10h)  
-* create the output folder, then run the following (1h):  
+* run the following to run street_edges_height.py in parallel on each cell (1h):  
 ./algo start --computer-file=nodes_urbino.dat --argument-file=Table_of_cells_urbino.dat --log=log_urbino.txt python run_street_edges_height.py  
 * python attributes_transform.py (1h30)
 
