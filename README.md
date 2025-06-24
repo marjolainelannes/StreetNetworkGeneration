@@ -23,24 +23,28 @@ Optional input file:
 This section describes command lines to run the model. Some codes are parallelized with algo. Calculation times for Paris region (600,000 links) are given when it takes more than a few minutes.
 
 1 - Load data describing the urban form in data/urban_form  
-* python define_grid.py  
-* python adjacent_cells.py 
-* python load_BDNB.py
-* python makeSUBbuildings.py (1h14)  
+* `python define_grid.py`  
+* `python adjacent_cells.py` 
+* `python load_BDNB.py`
+* `python makeSUBbuildings.py` (1h14)  
   
 2 - Load OpenStreetMap data in data/load_OSM  
-* python read_OSM.py
-* python road_graph.py (16h40)  
-* python road_links_neighborhood (1h30)  
-* python makeSUBroads.py (11h)  
-* python filter_waterways.py  
+* `python read_OSM.py`
+* `python road_graph.py` (16h40)  
+* `python road_links_neighborhood` (1h30)  
+* `python makeSUBroads.py` (11h)  
+* `python filter_waterways.py`  
   
 3 - Build the street graph  
-* python groups.py (3d15h)  
-* python graph_transform.py (1d16h)  
-* python streets_distribution.py (10h)  
+* `python groups.py` (3d15h)  
+* `python graph_transform.py` (1d16h)  
+* `python streets_distribution.py` (10h)  
 * run the following to run street_edges_height.py in parallel on each cell (1h):  
-./algo start --computer-file=nodes_urbino.dat --argument-file=Table_of_cells_urbino.dat --log=log_urbino.txt python run_street_edges_height.py  
-* python attributes_transform.py (1h30)
+`./algo start --computer-file=nodes_urbino.dat --argument-file=Table_of_cells_urbino.dat --log=log_urbino.txt python run_street_edges_height.py`  
+* `python attributes_transform.py` (1h30)
 
-If you already have an appropriate street network and would like to add width and height attributes to street links, you shall use the following code: src/street_graph/street_edges_height.py  
+If you already have an appropriate street network and would like to add width and height attributes to street links, you shall use the following code: `src/street_graph/street_edges_height.py`  
+
+
+Bibliography:
+> Kim, Y., Lugon, L., Maison, A., Sarica, T., Roustan, Y., Valari, M., Zhang, Y., André, M., and Sartelet, K.: MUNICH v2.0: a street-network model coupled with SSH-aerosol (v1.2) for multi-pollutant modelling, Geoscientific Model Development, 15, 7371–7396, https://doi.org/10.5194/gmd-15-7371-2022, publisher: Copernicus GmbH, 2022.
