@@ -33,7 +33,7 @@ This section describes command lines to run the model. Some codes are paralleliz
 * python road_graph.py (16h40)  
 * python road_links_neighborhood (1h30)  
 * python makeSUBroads.py (11h)  
-* python load_waterways.py  
+* python filter_waterways.py  
   
 3 - Build the street graph  
 * python groups.py (3d15h)  
