@@ -3,7 +3,6 @@
 # Purpose: Create a 0.02°x0.02° grid
 # Note: The grid is defined in latlon projection = "epsg:4326"
 ###################################################################################
-# documentation: https://fiona.readthedocs.io/en/latest/fiona.html#module-fiona
 import pandas as pd
 from shapely.geometry import Polygon
 import pickle
