@@ -7,7 +7,7 @@ Its original use is a street geometry preprocessor for street air quality models
 
 ## Model description
 
-![[docs/Flow_diagram.png]]
+![Flow_diagram](docs/Flow_diagram.png "Flow_diagram")
 
 ## Input data
   
