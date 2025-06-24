@@ -1,9 +1,8 @@
 ##################################################################################
 # Study: Street network generation
 # Purpose: Define road network (nodes and edges)
-# Author: Marjolaine Lannes
-# Creation date: January 20, 2023
-# Note: Merge consecutive roads, differentiate roads and PT links, add detailed geometry
+# Note: Merge double-ways and consecutive roads, differentiate roads and PT links,
+#       then add detailed geometry
 ##################################################################################
 import pandas as pd
 from shapely.geometry import LineString
@@ -12,15 +11,29 @@ from include.get_indexes import get_indexes
 import numpy as np
 import networkx as nx
 import pickle as pkl
+import time
+init_time = time.time()
+
+# Config
+path = "../../../"
+input_dir = path + "data/"
+cache_dir  = path + "temp/"
 
 # Input/output files
-path = "C:/Users/lannesadm/PycharmProjects/Road_network_topology/"
-links_f = path + "temp/load_OSM/OSM_links.csv"
-nodes_f = path + "temp/load_OSM/OSM_nodes.csv"
-detailed_network_f = path + "data/OSM/ile_de_france_detailed_network.csv"
-output_network_f = path + "temp/load_OSM/roads_links.csv"
-output_nodes_roads = path + "temp/load_OSM/roads_nodes.csv"
-output_preproc = path + "temp/load_OSM/roads_preprocessing.csv"
+detailed_network_f = input_dir + "OSM/ile_de_france_detailed_network.csv"
+links_f = cache_dir + "data/load_OSM/OSM_links.csv"
+nodes_f = cache_dir + "data/load_OSM/OSM_nodes.csv"
+output_network_f = cache_dir + "data/load_OSM/roads_links.csv"
+output_preproc = cache_dir + "data/load_OSM/roads_preprocessing.csv"
+output_nodes_roads = cache_dir + "data/load_OSM/roads_nodes.csv"
+railways_f = cache_dir + "data/load_OSM/railways.csv"
+# Temporary files
+roads_transform_f1 = open(cache_dir + "data/load_OSM/roads_transform_1.csv", 'wb')
+roads_transform_f2 = open(cache_dir + "data/load_OSM/roads_transform_2.csv", 'wb')
+geo_road_links_f = cache_dir + "data/load_OSM/geo_roads_links.csv"
+
+# Parameters
+length_threshold_to_merge_parallel_links = 40.0 #meters
 
 # Input df information
 link_dtypes = {'id':str,'from':str,'to':str,'length':float,'freespeed':float,'capacity':float,'permlanes':float,'oneway':int,
@@ -34,7 +47,6 @@ Nodes = pd.read_csv(nodes_f, dtype=node_dtypes)
 Nodes = Nodes.astype({'id': 'str'})
 Links = pd.read_csv(links_f, dtype=link_dtypes)
 Links = Links.astype({'id':'str'})
-#n_links = Links.shape[0]
 n_nodes = Nodes.shape[0]
 n_links = Links.shape[0]
 print("Number of nodes from OSM: ", n_nodes)
@@ -44,16 +56,15 @@ print("Data loaded...")
 
 # Filter public transports
 print("Filter public transports")
-filter_railways = ['artificial,rail','artificial,subway','artificial,tram','artificial,stopFacilityLink,funicular',
-                  'artificial,stopFacilityLink,tram','artificial,stopFacilityLink,rail','funicular,artificial',
-                  'rail','subway,artificial,stopFacilityLink','subway,pt','train,pt,rail']
+modes_list = list(Links['modes'].unique())
+filter_railways = list(set([modes for modes in modes_list if (not "car" in modes) and (not "bus" in modes)] +
+                           [mode for mode in modes_list if "artificial" in mode]))
 Railways = Links[Links['modes'].isin(filter_railways)].reset_index(drop=True)
 Links_OSM = Links[~Links['modes'].isin(filter_railways)].reset_index(drop=True)
-# Railways.to_csv(path + "temp/data/load_OSM/railways.csv", index=False)
+Railways.to_csv(railways_f, index=False)
 print("Number of edges after filter: ", Links_OSM.shape[0])
 
-# Merge double-way roads
-## i.e. transform the directed multigraph into an undirected simple graph
+# Merge double-way roads, i.e. transform the directed multigraph into an undirected simple graph
 print("Merge double-way roads")
 roads_transform = {}
 links_to_exclude = []
@@ -100,20 +111,17 @@ for i, node_i in enumerate(nodes) :
                         roads_transform[link_1] = link_2
 Links_OSM = Links_OSM[~Links_OSM['id'].isin(links_to_exclude)].reset_index(drop=True)
 print("Double-way roads merged...")
-Links_OSM.to_csv(path + "temp/data/load_OSM/double_way_roads_links.csv", index=False)
-roads_transform_f1 = open(path + "temp/data/load_OSM/roads_transform_1.csv", 'wb')
 pkl.dump(roads_transform, roads_transform_f1)
 n_links = Links_OSM.shape[0]
 print("Number of links after merging double-ways :", n_links)
 
-# Merge consecutive roads again for modified streets
-## i.e. drop nodes of order 2
+# Merge consecutive roads again for modified streets, i.e. drop nodes of degree 2
 print("Merge consecutive roads without intersection")
 Nodes_OSM = Nodes.copy()
 k=1
 nodes_transform = {}
-def get_keys_from_value(dict, value):
-    return [item[0] for item in dict.items() if item[1] == value]
+def get_keys_from_value(dictionary, value):
+    return [item[0] for item in dictionary.items() if item[1] == value]
 for i, node_i in enumerate(nodes) :
     if int(n_nodes * k / 10) == i :
         print(k*10, "%")
@@ -164,10 +172,14 @@ for i, node_i in enumerate(nodes) :
                 j = nodes.index(node_j)
                 point = [Nodes.loc[j, 'x'], Nodes.loc[j, 'y']]
                 line.append(point)
-            # check if the angle between links is not too large
-            are_on_the_same_line = segments_on_the_same_line(line[0], line[2], line[2], line[1])
+            # check if the angle between links is not too large and that at least one road is small (length)
+            are_on_the_same_line = segments_on_the_same_line(line[0], line[2], line[2], line[1], 30.0)
+            length_1 = Links_OSM.loc[link_1_index, 'length']
+            length_2 = Links_OSM.loc[link_2_index, 'length']
             # if it is not, drop node_i and keep only one link (link_2)
-            if are_on_the_same_line:
+            if are_on_the_same_line and ((length_1 < length_threshold_to_merge_parallel_links and
+                                          length_2 < length_threshold_to_merge_parallel_links)
+                                         or (length_1 < 0.1*length_2) or (length_2 < 0.1*length_1)) : # check lengths
                 # move node_i to the other node in link_2
                 from_or_to = [node_C, node_D].index(node_i)
                 other_node_id = [node_A, node_B]
@@ -196,9 +208,8 @@ for i, node_i in enumerate(nodes) :
 print("Consecutive roads merged...")
 nodes_to_exclude = list(nodes_transform.keys())
 Nodes_OSM = Nodes_OSM[~Nodes_OSM['id'].isin(nodes_to_exclude)].reset_index(drop=True)
-Links_OSM.to_csv(path + "temp/data/load_OSM/consecutive_roads_links.csv", index=False)
-Nodes_OSM.to_csv(path + "temp/data/load_OSM/consecutive_roads_nodes.csv", index=False)
-roads_transform_f2 = open(path + "temp/data/load_OSM/roads_transform_2.csv", 'wb')
+Links_OSM.to_csv(cache_dir + "data/load_OSM/consecutive_roads_links.csv", index=False)
+Nodes_OSM.to_csv(cache_dir + "data/load_OSM/consecutive_roads_nodes.csv", index=False)
 pkl.dump(roads_transform, roads_transform_f2)
 n_links = Links_OSM.shape[0]
 print("Number of links after merging consecutive roads:", n_links)
@@ -226,6 +237,8 @@ Roads_preproc.to_csv(output_preproc, index=False)
 print("Now saving road graph")
 Roads = pd.DataFrame(columns=link_col)
 Roads_nodes = pd.DataFrame(columns=node_col)
+ids_with_detailed_geom = list(detailed_network_df['LinkId'])
+merged_roads = list(roads_transform.values())
 for i in range (0,n_links) :
     # get link, node A and node B ids
     link_id = Links_OSM.loc[i, 'id']
@@ -280,24 +293,23 @@ for i in range (0,n_links) :
     link_row.loc[0, 'TUNNEL'] = Links_OSM.loc[i, 'tunnel']
     link_row.loc[0, 'ROUNDABOUT'] = Links_OSM.loc[i, 'roundabout']
     link_row.loc[0, 'LINE'] = LineString([(xa, ya), (xb, yb)])
+    ## add detailed geometry
+    if (not (link_id in merged_roads)) and (link_id in ids_with_detailed_geom) :
+        road_i = detailed_network_df[detailed_network_df.LinkId == link_id].reset_index(drop=True)
+        link_row.loc[0,'GEOMETRY'] = road_i.loc[0, 'Geometry']
+    else :
+        link_row.loc[0, 'GEOMETRY'] = link_row.loc[0, 'LINE']
     Roads = pd.concat([Roads, link_row], ignore_index=True)
     if i % 1000 == 0 :
         print(i)
 print("OSM network saved in edges and nodes dataframes...")
-Roads.to_csv(path + "temp/data/load_OSM/geo_roads_links.csv", index = False)
+Roads.to_csv(geo_road_links_f, index = False)
 Roads_nodes.to_csv(output_nodes_roads, index = False)
-
-# Get detailed geometry for each road
-print("Get detailed geometry for each road")
-ids_with_detailed_geom = list(detailed_network_df['LinkId'])
-merged_roads = list(roads_transform.values())
-for i,road_id in enumerate(Roads['ID']):
-    if (not (road_id in merged_roads)) and (road_id in ids_with_detailed_geom) :
-        road_i = detailed_network_df[detailed_network_df.LinkId == road_id].reset_index(drop=True)
-        Roads.loc[i,'GEOMETRY'] = road_i.loc[0, 'Geometry']
-    else :
-        Roads.loc[i, 'GEOMETRY'] = Roads.loc[i, 'LINE']
-print("Detailed geometry added...")
 
 # Save data
 Roads.to_csv(output_network_f, index = False)
+
+# Print time
+time_total = time.time() - init_time
+time_t = time.gmtime(time_total)
+print("Total time: ", time_t.tm_hour, 'hour', time_t.tm_min, 'min', time_t.tm_sec, 'sec.')
