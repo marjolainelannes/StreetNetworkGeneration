@@ -1,6 +1,6 @@
 # Street network generation model
 
-
+![Paris_streets](docs/Paris_street_network.png "Paris_streets")
 
 This project builds a street network with street length, width and mean building's height based on OpenStreetMap road network and a building database.  
 Its original use is a street geometry preprocessor for street air quality models such as MUNICH (Kim et al. 2022). 
@@ -20,7 +20,7 @@ Optional input file:
 
 ## Simulation
 
-This section describes command lines to run the model. Some codes are parallelized with algo. Calculation times for Paris region (600,000 links) are given when it takes more than a few minutes.
+This section describes command lines to run the model. Some codes are parallelized with algo. Calculation times for Paris region (~600,000 links) are given when it takes more than a few minutes.
 
 1 - Load data describing the urban form in data/urban_form  
 * `python define_grid.py`  
