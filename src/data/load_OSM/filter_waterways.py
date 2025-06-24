@@ -6,11 +6,16 @@
 import pickle
 import geopandas as gpd
 
+# Config
+path = "../../../"
+input_dir = path + "data/"
+cache_dir  = path + "temp/"
+
 # Input and output files
 path = "../../../"
-waterways_input = path + 'data/OSM/waterways/waterways.shp'
-fout_dat = path + 'temp/load_OSM/waterways/waterways.dat'
-fout_shp = path + 'temp/load_OSM/waterways/filtered_waterways.shp'
+waterways_input = input_dir + 'OSM/waterways/waterways.shp'
+fout_dat = cache_dir + 'load_OSM/waterways/waterways.dat'
+fout_shp = cache_dir + 'load_OSM/waterways/filtered_waterways.shp'
 
 # Load buildings input and filter underground / overground / tunnels
 data = gpd.read_file(waterways_input)
