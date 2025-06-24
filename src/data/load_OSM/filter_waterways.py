@@ -1,8 +1,6 @@
 ##################################################################################
 # Study: Street network generation
 # Purpose: to save waterways information from OSM
-# Author: Marjolaine Lannes
-# Creation date: September 12, 2023
 # Note: Get (filtered) waterways location for Ile-de-France region
 ##################################################################################
 import pickle
