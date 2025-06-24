@@ -1,18 +1,23 @@
 ##################################################################################
 # Study: Street network generation
-# Purpose: Create a geograph for the road network
-# Author: Marjolaine Lannes
-# Creation date: May 5, 2023
+# Purpose: Create a graph for the road network
 # Note: Read edges/nodes attributes of OSM road network
 ##################################################################################
 import pandas as pd
 import xml.etree.ElementTree as Xet
+import os
 
-# Input files
-path = "C:/Users/lannesadm/PycharmProjects/Road_network_topology/"
-MATSim_network = path + "data/OSM/ile_de_france_network.xml"
-output_links_f = path + "temp/load_OSM/OSM_links.csv"
-output_nodes_f = path + "temp/load_OSM/OSM_nodes.csv"
+# Config
+path = "../../../"
+input_dir = path + "data/"
+cache_dir  = path + "temp/"
+
+# files
+MATSim_network = input_dir + "OSM/ile_de_france_network.xml"
+output_links_f = cache_dir + "load_OSM/OSM_links.csv"
+output_nodes_f = cache_dir + "load_OSM/OSM_nodes.csv"
+if not os.path.exists(cache_dir + "load_OSM/"):
+    os.makedirs(cache_dir + "load_OSM/")
 
 # Load OSM information
 xmlparse = Xet.parse(MATSim_network)
@@ -36,7 +41,7 @@ for i in range (0, n_links) : #one dataframe for all elements of this type
     road_i = links[i]
     # Get the road default attributes: from, to, length, etc
     row_i = road_i.attrib
-    # Add attributes 'roundabout', 'Boulevard_peripherique' and 'tunnel'
+    # Add 'roundabout' and 'tunnel' attributes
     row_i['roundabout'] = False
     row_i['tunnel'] = False
     for attributes in road_i.iter('attributes'):
@@ -45,7 +50,7 @@ for i in range (0, n_links) : #one dataframe for all elements of this type
              # check if the road is a roundabout
              if attribute_name == "osm:way:junction" :
                  junction_type = attribute.text
-                 if junction_type in ['roundabout', 'circular'] : # also : jughandle
+                 if junction_type in ['roundabout', 'circular'] : # it is also possible to add jughandle
                      row_i['roundabout'] = True
              # check if the road is a tunnel
              if attribute_name == "osm:way:tunnel" :
