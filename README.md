@@ -26,7 +26,7 @@ This section describes command lines to run the model. Some codes are paralleliz
 * `python define_grid.py`  
 * `python adjacent_cells.py` 
 * `python load_BDNB.py`
-* `python makeSUBbuildings.py` (1h14)  
+* `python makeSUBbuildings.py` (1h15)  
   
 2 - Load OpenStreetMap data in data/load_OSM  
 * `python read_OSM.py`
