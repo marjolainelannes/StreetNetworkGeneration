@@ -13,10 +13,11 @@ Its original use is a street geometry preprocessor for street air quality models
   
 Mandatory input files:
 + OpenStreetMap road network: here the xml output from eqasim (based on pt2matsim) is read  
-+ buildings: BDNB database  
++ buildings: for France we used BDNB database available here: [https://bdnb.io/archives\_data/bdnb\_millesime\_2022\_10\_d](https://bdnb.io/archives\_data/bdnb\_millesime\_2022\_10\_d)
   
 Optional input file:  
-+ OpenStreetMap detailed road network (with detailed geometry instead of a straight line): here the xml output from eqasim (based on pt2matsim) is read  
++ OpenStreetMap detailed road network (with detailed geometry instead of a straight line): here the xml output from eqasim (based on pt2matsim) is read
++ waterways: extracted from OpenStreetMap
 
 ## Simulation
 
