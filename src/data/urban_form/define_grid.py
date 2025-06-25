@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from pyproj import Proj, transform
 
 path = "../../../"
-outputdir = path + "data/grid_data/"
+data_dir = path + "data/"
 
 ################################################################
 # 1. Create a grid
@@ -40,7 +40,7 @@ def create_grid_from_coordinates(minx: float, dx: float, Nx: int, miny: float, d
    with fiona.open(out_shp, 'w', driver="ESRI Shapefile", schema=schema, crs="epsg:4326") as grid_shp:
       grid_shp.write({'geometry': mapping(grid), "properties": {"id": 0}})
 
-create_grid_from_coordinates(minx=1.35, dx=0.02, Nx=110, miny=48, dy=0.02, Ny=75, path=outputdir)
+create_grid_from_coordinates(minx=1.35, dx=0.02, Nx=110, miny=48, dy=0.02, Ny=75, path = data_dir + "grid_data/")
 
 ###############################################################
 # 2. Create polygons for cells
@@ -107,4 +107,4 @@ def create_cell_polys(minx, dx, Nx, miny, dy, Ny, buffer, path) :
    polys_df.to_csv(fnameout_csv, index=False)
    plt.show()
 
-create_cell_polys(minx=1.35, dx=0.02, Nx=110, miny=48, dy=0.02, Ny=75, buffer=100, path=outputdir)
+create_cell_polys(minx=1.35, dx=0.02, Nx=110, miny=48, dy=0.02, Ny=75, buffer=100, path = data_dir + "grid_data/")
