@@ -48,7 +48,7 @@ def angle_two_lines(slope1, slope2):
     angle = math.degrees(math.atan((slope2-slope1)/(1+(slope2*slope1))))
     return(angle)
 
-def segments_on_the_same_line(line1_pointA : list, line1_pointB : list, line2_pointC : list, line2_pointD : list) :
+def segments_on_the_same_line(line1_pointA : list, line1_pointB : list, line2_pointC : list, line2_pointD : list, angle_threshold:float) :
     import math
     line1 = line1_pointA + line1_pointB
     line2 = line2_pointC + line2_pointD
@@ -57,7 +57,7 @@ def segments_on_the_same_line(line1_pointA : list, line1_pointB : list, line2_po
     theta = angle_two_lines(s1, s2)
     dist = distance_to_line(line1_pointA, line2_pointC, line2_pointD)
     #print("distance", dist, "angle", theta, "sinus", abs(math.sin(math.radians(theta))))
-    if abs(math.sin(math.radians(theta))) < 0.5 : # NB: sin(30) = 0.5
+    if abs(math.sin(math.radians(theta))) < abs(math.sin(math.radians(angle_threshold))) :
         if (abs(math.sin(math.radians(theta))) > 0.1736)  and (dist < 10): # NB: sin(10) = 0.1736
             return(True)
         # flat angles require a smaller distance to check if the lines are not parallel
@@ -68,15 +68,20 @@ def segments_on_the_same_line(line1_pointA : list, line1_pointB : list, line2_po
     else :
         return(False)
 
-def parallel_lines(points_coordinates_segment_1 : list, points_coordinates_segment_2 : list) :
+def parallel_lines(points_coordinates_segment_1 : list, points_coordinates_segment_2 : list, angle_threshold:float) :
     import math
     s1 = slope(points_coordinates_segment_1)
     s2 = slope(points_coordinates_segment_2)
     theta = angle_two_lines(s1, s2)
-    if abs(math.sin(math.radians(theta))) < 0.5 : # NB: sin(30) = 0.5
+    if abs(math.sin(math.radians(theta))) < abs(math.sin(math.radians(angle_threshold))) :
         return(True)
     else :
         return(False)
+
+def closest_line_from_point(Point_P, LineStrings_list):
+    distance_list = [line.distance(Point_P) for line in LineStrings_list]
+    shortest_distance = min(distance_list)  # find the line closest to the point
+    return(distance_list.index(shortest_distance))
 
 def get_street_line(node : list, lines_A_list : list, lines_B_list : list) :
     # node : [x,y] to project on all lines
@@ -100,5 +105,3 @@ def get_street_line(node : list, lines_A_list : list, lines_B_list : list) :
     # 3. calcule the y_intercept of the line
     y_intercept = centroid[1] - a * centroid[0]
     return(a, y_intercept)
-
-# a tester : get_street_line
