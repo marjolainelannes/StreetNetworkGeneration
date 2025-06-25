@@ -40,3 +40,4 @@ def create_1_poly_around_road(xa,ya,xb,yb,width):
     # Create one polygon
     road_poly=Polygon(((x1, y1), (x2, y2), (x3, y3), (x4, y4)))
     return(road_poly)
+    
