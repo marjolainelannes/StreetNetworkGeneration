@@ -24,7 +24,7 @@ max_height = 100 #meters
 max_width_then_open = 160 #meters
 street_crossed_by_buidings_ratio = 0.5 # if more than n% of the street geometry crosses the building, take the main road geometry instead
 
-# Load grid data
+# Directories
 path = "../../"
 input_dir = path + "data/"
 cache_dir  = path + "temp/"
