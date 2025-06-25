@@ -4,10 +4,8 @@
 # Note: Get roads information (id, geometry) of OSM roads for each cell of the grid
 ##################################################################################
 import pandas as pd
-import pickle
+import pickle, time
 import geopandas as gpd
-import time
-#from itertools import repeat # np
 from shapely.wkt import loads
 
 # Param
