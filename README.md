@@ -40,7 +40,7 @@ This section describes command lines to run the model. Some codes are paralleliz
 * `python groups.py` (3d15h)  
 * `python graph_transform.py` (1d16h)  
 * `python streets_distribution.py` (10h)  
-* run the following to run street_edges_height.py in parallel on each cell (1h): `python algo_generate.py` then `./algo start --computer-file=nodes_urbino.dat --argument-file=Table_of_cells_urbino.dat --log=log_urbino.txt python run_street_edges_height.py`  
+* run the following to run street_edges_height.py in parallel on each cell (1h): `python algo_generate.py` then for each computer `./algo start --computer-file=nodes_computer_1.dat --argument-file=Table_of_cells_computer_1.dat --log=log_computer_1.txt python run_street_edges_height.py`  
 * `python attributes_transform.py` (1h30)
 
 If you already have an appropriate street network and would like to add width and height attributes to street links, you should use the following code: `src/street_graph/street_edges_height.py`  
