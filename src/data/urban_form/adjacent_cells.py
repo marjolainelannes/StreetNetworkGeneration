@@ -4,11 +4,9 @@
 ###################################################################################
 import pickle
 
-# Ouput
+# Config
 path = "../../../"
-f_out = path + "data/grid_data/adjacent_cells.dat"
-
-# Parameters
+input_dir = path + "data/"
 Nx=110
 Ny=75
 
@@ -42,4 +40,5 @@ for C in range(N_cells):
     adjacent_cells[C] = adjacent_cell_C
 
 # Save it
+f_out = input_dir + "grid_data/adjacent_cells.dat"
 pickle.dump(adjacent_cells, open(f_out, "wb"))
