@@ -19,6 +19,8 @@ Optional input file:
 + OpenStreetMap detailed road network (with detailed geometry instead of a straight line), here the xml output from [eqasim](https://github.com/eqasim-org/ile-de-france) (which is based on [pt2matsim](https://github.com/matsim-org/pt2matsim)) with detailed option
 + Waterways: here extracted from OpenStreetMap in QGis
 
+Example files are given for the Paris region in the `data/` folder. Buildings data still need to be downloaded (either as csv/Excel with Geometry column or shapefiles: they will be read as GeoDataFrame with geopandas).
+
 ## Simulation
 
 This section describes command lines to run the model. Some codes are parallelized with algo. Calculation times for Paris region (~600,000 links) are given when it takes more than a few minutes.
