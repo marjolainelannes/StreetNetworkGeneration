@@ -8,7 +8,7 @@ import pickle, time
 import geopandas as gpd
 from shapely.wkt import loads
 
-# Param
+# Directories
 path = "../../../"
 temp_dir = path + "temp/"
 data_dir = path + "data/"
