@@ -6,12 +6,13 @@
 ##################################################################################
 import pandas as pd
 from shapely.geometry import LineString
-from include.lines_geometry import segments_on_the_same_line, create_network_graph
-from include.get_indexes import get_indexes
+import time, sys
+sys.path.append("../../../include")
+from lines_geometry import segments_on_the_same_line, create_network_graph
+from get_indexes import get_indexes
 import numpy as np
 import networkx as nx
 import pickle as pkl
-import time
 init_time = time.time()
 
 # Config
