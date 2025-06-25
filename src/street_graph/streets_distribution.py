@@ -1,8 +1,6 @@
 ##################################################################################
 # Study: Street network generation
 # Purpose: Get streets attributes: width, height, cells distribution
-# Author: Marjolaine Lannes
-# Creation date: April 25, 2023
 ##################################################################################
 import pickle, os
 import pandas as pd
@@ -13,7 +11,7 @@ import shapely.ops as sp_ops
 import pyproj
 from shapely import wkt
 
-# Parameters sidewalks
+# Directories
 path = "../../"
 data_dir  = path + "data/"
 temp_dir  = path + "temp/"
