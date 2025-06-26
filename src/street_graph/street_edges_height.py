@@ -1,9 +1,9 @@
-##################################################################################
+#######################################################################################
 # Study: Street network generation
 # Purpose: Get distance to buildings and mean street height for the edges of each street within a cell
-# Note: mean height and distance to buildings are calculated for left and right edges of the roads in the cell
-# Warning : we do not consider buildings higher than 100 meters
-##################################################################################
+# Note: mean height and distance to buildings are calculated for left and right edges of the streets in the cell
+# Warning : we do not consider buildings higher than 100 meters (see paramaters below)
+#######################################################################################
 import sys
 import pandas as pd
 import geopandas as gpd
@@ -55,7 +55,7 @@ if n_streets > 0 :
     buildings_df = pd.DataFrame(buildings)
     buildings_gdf = gpd.GeoDataFrame(buildings_df, crs='epsg:2154', geometry='POLYGON')
 
-# Calculate street heights in BD TOPO
+# Calculate street heights from buildings database
 init_list = [0]*n_streets
 streets_height_width = {'STREET_ID':streets_list, 'HEIGHT_LEFT': init_list.copy(), 'HEIGHT_RIGHT':init_list.copy(), 'WIDTH':init_list.copy(),
                         'OPEN':['no']*n_streets, 'RATIO': init_list.copy()}
@@ -167,7 +167,7 @@ for s, street_id in enumerate(streets_list) :
                     widths_left[i] = new_width
             building_distance += 10 # If no building found, try with a larger polygon around the road
         if sum(n_buildings_left) + sum(n_buildings_right) > 0:
-            # average height on the left side of the road
+            # average height on the left side of the street
             aver_list_left = [0.0] * n_poly
             for j in range(0, n_poly):
                 if n_buildings_left[j] > 0: # IndexError: list index out of range
@@ -175,7 +175,7 @@ for s, street_id in enumerate(streets_list) :
                 else:
                     aver_list_left[j] = 0
             aver_height_left = sum(aver_list_left) / n_poly
-            # average height on the right side of the road
+            # average height on the right side of the street
             aver_list_right = [0.0] * n_poly
             for k in range(0, n_poly):
                 if n_buildings_right[k] > 0:
@@ -183,7 +183,7 @@ for s, street_id in enumerate(streets_list) :
                 else:
                     aver_list_right[k] = 0
             aver_height_right = sum(aver_list_right) / n_poly
-            # calculate road width
+            # calculate street width
             if (aver_height_right > 0) and (aver_height_left > 0) :
                 widths = [sum(x) for x in zip(widths_left, widths_right)]
                 mean_width = np.nanmedian(widths)
@@ -195,12 +195,12 @@ for s, street_id in enumerate(streets_list) :
             aver_height_left = 0.0
             aver_height_right = 0.0
             mean_width = np.nan
-            # Save the collected data in the output dataframe
+        # Save the collected data in the output dataframe
         streets_height_width['HEIGHT_LEFT'][s] = aver_height_left
         streets_height_width['HEIGHT_RIGHT'][s] = aver_height_right
         streets_height_width['WIDTH'][s] = mean_width
 
-# Save height and width data for each road
+# Save height and width data for each street
 fout = open(outdir + fname, 'wb')
 pickle.dump(streets_height_width, fout)
 fout.close()
